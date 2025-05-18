@@ -1,0 +1,25 @@
+HTTPS + AWS CLI 认证脚本说明
+脚本做的事：
+
+安装 AWS CLI（如果没装）
+
+配置 AWS CLI（会提示你输入 Access Key、Secret Key、区域等）
+
+配置 Git 使用 AWS CLI 的 CodeCommit 凭证助手（credential helper）
+
+提示你用 HTTPS URL 克隆仓库
+
+使用方法
+把脚本保存为 setup_codecommit_https.sh
+
+赋予执行权限：
+
+bash
+chmod +x setup_codecommit_https.sh
+运行脚本：
+
+bash
+./setup_codecommit_https.sh
+按提示输入 AWS Access Key、Secret Key、默认区域（填东京区 ap-northeast-1）
+
+配置完毕后，用 Git HTTPS 地址克隆你的 CodeCommit 仓库即可。
