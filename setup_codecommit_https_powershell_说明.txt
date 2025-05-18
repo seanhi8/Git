@@ -1,15 +1,12 @@
 打开 PowerShell（推荐以管理员身份）
 
 运行脚本：
-powershell
 .\setup_codecommit_https_powershell.ps1
 
 如果提示不能运行脚本，请先运行以下命令允许当前脚本执行（只需一次）：
-powershell
 Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 验证 HTTPS 访问
 你现在可以测试克隆仓库：
-powershell
 git clone https://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/你的仓库名
 第一次访问时，Git 会调用 AWS CLI 获取临时凭证，不需要手动输入用户名/密码。
