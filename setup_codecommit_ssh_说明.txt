@@ -1,0 +1,130 @@
+使用说明
+先打开终端，进入你希望放脚本的文件夹
+
+把下面脚本内容保存为 setup_codecommit_ssh.sh
+
+给脚本执行权限：chmod +x setup_codecommit_ssh.sh
+
+运行：./setup_codecommit_ssh.sh
+
+注意：脚本不会自动上传公钥到 AWS IAM（这个必须你手动复制公钥内容到 AWS 控制台），但会帮你生成 Key 并配置 SSH。
+
+脚本功能详解
+1. 检查是否已有 SSH Key
+脚本默认你的 SSH 私钥是 ~/.ssh/id_rsa
+
+如果这个文件已经存在，会提示你是否要覆盖它（删除旧密钥重新生成）
+
+如果你选择不覆盖，脚本跳过生成新密钥步骤，继续用已有密钥
+
+2. 生成 SSH Key
+如果之前没有密钥，或者你选择覆盖，脚本会帮你生成一对新的 SSH 密钥对（RSA 4096位）
+
+生成的密钥对保存在默认路径：~/.ssh/id_rsa（私钥）和 ~/.ssh/id_rsa.pub（公钥）
+
+生成过程不设置密码（方便自动化使用）
+
+3. 显示公钥内容并提示上传
+脚本会打印公钥内容（id_rsa.pub 文件内容）
+
+你需要复制这段内容，登录 AWS IAM 控制台，将它添加到你的 IAM 用户的“SSH Keys for AWS CodeCommit”里
+
+脚本会等待你确认已经完成上传操作，确保后续能用这把钥匙认证
+
+4. 让你输入 SSH 公钥 ID
+上传公钥后，AWS IAM 会给你一个公钥 ID（类似 APKAEIBAERJR2EXAMPLE）
+
+你把这个 ID 填进脚本，脚本会用它来配置 SSH 连接身份
+
+5. 配置 SSH 客户端的 ~/.ssh/config 文件
+脚本会备份你已有的 SSH 配置文件（如果有）
+
+删除已有的关于 CodeCommit 的配置（防止重复冲突）
+
+添加新的配置段，指定：
+
+访问 CodeCommit 的 host 用你的公钥 ID 作为用户名
+
+用刚刚生成的私钥文件做身份认证
+
+这样 SSH 连接 AWS CodeCommit 时，就知道用哪个密钥和用户名认证了
+
+6. 测试 SSH 连接
+脚本自动尝试用 SSH 连接东京区 CodeCommit 服务器
+
+如果成功，会显示成功的提示（一般会收到 AWS 连接欢迎信息）
+
+如果失败，会提示你检查网络或配置
+
+7. 给出后续操作建议
+告诉你现在可以用 SSH URL 克隆仓库了，比如：
+
+bash
+复制
+编辑
+git clone ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/你的仓库名
+总结
+这个脚本就是帮你：
+
+生成 SSH Key（如果没有）
+
+显示公钥方便你上传 AWS IAM
+
+配置 SSH 使用你的密钥和对应的 AWS 公钥 ID
+
+自动检测 SSH 连接是否成功
+
+做到这些后，你就能用 SSH 安全地访问 AWS CodeCommit 仓库了！
+
+
+AWS IAM 上传 SSH 公钥简明教程
+1. 登录 AWS 控制台
+打开浏览器，访问：https://console.aws.amazon.com/
+
+使用你的 AWS 账号登录。
+
+2. 进入 IAM 用户管理
+在搜索栏输入 IAM，点击进入 IAM 控制台。
+
+左侧菜单点击 Users（用户）。
+
+找到并点击你的用户名（就是你登录 AWS 时的用户）。
+
+3. 上传 SSH 公钥
+进入用户详情页后，点击上方的 Security credentials（安全凭证） 标签。
+
+向下滚动，找到 SSH keys for AWS CodeCommit 部分。
+
+点击 Upload SSH public key 按钮。
+
+4. 粘贴公钥内容
+打开你本地的公钥文件，比如执行命令：
+
+bash
+复制
+编辑
+cat ~/.ssh/id_rsa.pub
+复制终端显示的全部内容（以 ssh-rsa 开头，末尾是你的邮箱或备注）。
+
+粘贴到 AWS 控制台上传框里。
+
+点击 Upload SSH public key 按钮完成上传。
+
+5. 记录公钥 ID
+上传完成后，AWS 会显示一个类似 APKAEIBAERJR2EXAMPLE 的 SSH 公钥 ID。
+
+记下这个公钥 ID，后续配置 SSH 连接时需要用它。
+
+6. 后续
+在你的 ~/.ssh/config 文件中，配置 Host，User 填写这个公钥 ID，IdentityFile 指向你的私钥。
+
+这样你的 SSH 客户端才能用这把公钥认证 AWS CodeCommit。
+
+如果你已经有脚本，输入这个公钥 ID 后，脚本会帮你写配置并测试连接。
+
+小提示：
+
+这个 SSH 公钥只关联你这个 IAM 用户的 CodeCommit 权限。
+
+你必须用同一个 IAM 用户的访问密钥或权限来操作仓库。
+
